@@ -167,3 +167,8 @@ ul#letter-list li:hover {
     opacity: 0.8;
   }
 }
+#letter-body {
+    white-space: pre-wrap; /* Quan trọng nhất để hiện xuống dòng */
+    line-height: 1.6;      /* Khoảng cách dòng cho dễ đọc */
+    text-align: left;      /* Căn trái cho giống lá thư */
+}

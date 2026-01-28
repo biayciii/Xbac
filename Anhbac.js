@@ -43,6 +43,15 @@ const users = [
         title: "30122025: Ending 2025 🧨🎆",
         content: `Vậy là một năm sắp trôi qua, có vui có buồn, hạnh phúc-tan vỡ-chia li-hi vọng. Dù có ra sao, chúng ta vẫn hạnh phúc bên nhau dù trong tim mỗi người cũng đã có những vết gợn. Một năm dương lịch sắp trôi qua, mong rằng năm tới chúng ta vẫn sẽ cùng nhau hạnh phúc, cùng yêu thương để cùng hy vọng cho một tình yêu đẹp nhé. \n Yêu em, người lừa tình tôi 🙂😀😊`,
         code: "30122025"
+      },
+      {
+        title: "28012026: January 🐬😺",
+        content: `Buồn lắm các em ạ lại phải viết thư, tháng đầu năm cũng sắp kết thúc mình cũng có đôi lời muốn nói
+        Tháng này buồn lắm vì chẳng có chuyện gì buồn lắm giữa hai chúng mình, không biết tháng sau có buồn thật không nhỉ😄
+        Mà cũng sắp đến tết âm rồi nhỉ con vợ chuẩn bị tinh thần ăn tết thôi, xa chồng xa con đi về quê uống rượu, thích nhỉ. 
+        Mong tháng sau, cũng là năm mới đến sẽ có nhiều điều hay ho hơn trong cuộc sống và trong tình cảm nhé. 
+        Mà con vợ ăn tết xong giảm cân đi nhá, dạo này thấy bắt đầu thức khuya dậy muộn rồi đấy. Chào con vợ nhé yeah yeah 🐬😘🥰🥰🥰`,
+        code: "28012026"
       }
     ]
   }
@@ -87,14 +96,23 @@ function showLetters(letters) {
 /* ---------- VERIFY CODE ---------- */
 function verifyCode() {
   const codeInput = document.getElementById("verify-code").value.trim();
+  const verifyMsg = document.getElementById("verify-msg");
 
   if (selectedLetter && codeInput === selectedLetter.code) {
     toggleScreen("verify-screen", false);
     document.getElementById("letter-title").textContent = selectedLetter.title;
-    document.getElementById("letter-body").textContent = selectedLetter.content;
+    
+    // SỬA TẠI ĐÂY: Dùng innerText để giữ định dạng xuống dòng của lá thư
+    const letterBody = document.getElementById("letter-body");
+    letterBody.innerText = selectedLetter.content; 
+    
+    // ĐẢM BẢO CSS: Thêm dòng này để văn bản tự động xuống dòng nếu quá dài
+    letterBody.style.whiteSpace = "pre-wrap"; 
+    letterBody.style.wordBreak = "break-word";
+
     toggleScreen("letter-content-screen", true);
   } else {
-    document.getElementById("verify-msg").textContent = "Mã xác nhận không đúng!";
+    verifyMsg.textContent = "Mã xác nhận không đúng!";
   }
 }
 

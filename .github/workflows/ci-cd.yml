@@ -1,25 +1,56 @@
-name: CI/CD Pipeline
+name: CI-CD Pipeline
 
 on:
+  pull_request:
+    branches: [main]
   push:
-    branches: ["main"]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-and-push:
+  test-and-build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          username: ${{ secrets.BIAYCIII }}
-          password: ${{ secrets.BIAYCII }}
+          python-version: "3.12"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.BIAYCIII }}/my-devops-app:latest
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-beginner-project:${{ github.sha }} .
+
+  deploy:
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy on server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            cd /opt/devops-beginner-project &&
+            ./scripts/deploy.sh
+          '

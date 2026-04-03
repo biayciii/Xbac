@@ -1,17 +1,14 @@
-# Sử dụng base image Python nhẹ nhàng
-FROM python:3.10-slim
-# Đặt thư mục làm việc trong container
-WORKDIR /test
+FROM python:3.12-slim
 
-# Copy file requirements và cài đặt dependencies
-COPY tai.txt .
-RUN pip install --no-cache-dir -r tai.txt
+WORKDIR /app
 
-# Copy toàn bộ source code vào container
-COPY . .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 5000
-EXPOSE 5000
+COPY app ./app
 
-# Lệnh chạy ứng dụng
-CMD ["python", "test.py"]
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

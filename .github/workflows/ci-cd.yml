@@ -7,21 +7,25 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests
@@ -30,7 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t devops-beginner-project:${{ github.sha }} .
+          docker build -t devops1:${{ github.sha }} .
 
   deploy:
     needs: test-and-build
@@ -39,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup SSH key
         run: |
@@ -51,6 +55,6 @@ jobs:
       - name: Deploy on server
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            cd /opt/devops-beginner-project &&
+            cd /opt/devops1 &&
             ./scripts/deploy.sh
           '
